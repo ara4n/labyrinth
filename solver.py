@@ -13,8 +13,8 @@ pygame.init()
 screen = pygame.display.set_mode(size)
 
 PIPE = "pipe" # is ⎮ in rotation 0
-TEE  = "tee"  # is ├ in position 0
-BEND = "bend" # is ⏋in position 0
+TEE  = "tee"  # is ├ in rotation 0
+BEND = "bend" # is ⏋in rotation 0
 
 pieces = [
     [ # row 0 (top row)
