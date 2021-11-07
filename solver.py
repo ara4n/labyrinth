@@ -17,7 +17,7 @@ TEE  = "tee"  # is ├ in position 0
 BEND = "bend" # is ⏋in position 0
 
 pieces = [
-    [ # top row (row 0)
+    [ # row 0 (top row)
         { 'shape': BEND,  'contents': "red",         'rotation': 3 },
         { 'shape': PIPE,  'contents': None,          'rotation': 1 },
         { 'shape': TEE,   'contents': "skull",       'rotation': 1 },
