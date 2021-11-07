@@ -3,12 +3,11 @@
  * Tell the computer about what tiles we have ✅
  * Tell the computer about how the tiles behave ✅
  * Tell the computer about the board ✅
-    * (especially the squares which don't move around) - only needed if you're playing the game
  * Tell the computer how to draw the board ✅
- * Tell the computer how to try to get from one tile the other (i.e. solve the maze)
- * Tell the computer how to draw the route from one tile to another
+ * Tell the computer how to try to get from one tile the other (i.e. solve the maze) ✅
+ * Tell the computer how to draw the route from one tile to another ✅
  * Tell the computer how you push a tile into the board
-     * Tell the computer how to draw pushing a tile into the board (don't need this if we're doing a solver)
+     * Tell the computer how to draw pushing a tile into the board (don't need this if we're just doing a solver)
  * Tell the computer where the players are on the board
 
 What do we want this to actually do?
