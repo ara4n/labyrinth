@@ -23,7 +23,7 @@ We chose option 1a.
      * Tell the computer how to draw pushing a tile into the board (don't need this if we're just doing a solver)
  * Tell the computer where the players are on the board
 
-## What lost pieces do we have?
+## What pieces have we lost?
   * Princess
   * Bat
   * Corner
