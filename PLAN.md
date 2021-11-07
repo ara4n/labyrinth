@@ -3,8 +3,9 @@
 ## What do we want this to actually do?
 
  1. Solve an existing board
-   a) "Where is the best place (if any) to push the spare piece in order to win my move?"
-   b) Do AR and show where to put the piece, and what the route should be?
+
+   * "Where is the best place (if any) to push the spare piece in order to win my move?"
+   * Do AR and show where to put the piece, and what the route should be?
 
  2. Have a computer version of the game you can play with someone else if you've lost the pieces?
 
