@@ -82,7 +82,7 @@ pieces = [
     ],
 ]
 
-spare = { 'shape': BEND, 'contents': None }
+spare = { 'shape': BEND,  'contents': None,          'rotation': 2 }
 
 class Piece:
     def __init__(self, shape, contents, start_rotation, file_name):
@@ -152,7 +152,7 @@ class Board:
                 piece = self.pieces[y][x]
                 rect = piece.image.get_rect()
                 position = pygame.Rect(x * piece_width, y * piece_height, piece_width, piece_height)
-                image = pygame.transform.rotate(piece.image, piece.rotation * 90.0)
+                image = pygame.transform.rotate(piece.image, (piece.rotation - piece.start_rotation) * 90.0)
                 screen.blit(image, position)
 
     # returns the piece if we can slide
@@ -288,7 +288,7 @@ for row in pieces:
 spare = Piece(
     spare['shape'],
     spare['contents'],
-    0,
+    spare['rotation'],
     f"img/spare.jpg",
 )
 
@@ -296,6 +296,11 @@ screen.fill(black)
 board.draw()
 pygame.display.flip()
 pygame.event.get()
+
+# while 1:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT: sys.exit()
+
 
 # search all possible slides
 for side in range(0, 4):
