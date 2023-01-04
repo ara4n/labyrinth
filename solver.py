@@ -229,7 +229,7 @@ class Board:
 
                 # check we're not looping back on ourselves
                 if direction == opposite_direction(entry_direction):
-                    print(f"Refusing to loop back on ourselves")
+                    print(f"Refusing to loop back on ourselves dir={direction}, entry_dir={entry_direction}")
                     continue
 
                 # check that the new position has an entrance that matches this exit
@@ -265,8 +265,18 @@ def opposite_direction(direction):
     if direction == 1: opposite_direction = 3
     if direction == 2: opposite_direction = 0
     if direction == 3: opposite_direction = 1
-    if direction == None: opposite_direction = True
+    if direction == None: opposite_direction = -1
     return opposite_direction
+
+def wait_for_key():
+    pygame.event.clear()
+    while True:
+        event = pygame.event.wait()
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            break
 
 board = Board()
 
@@ -297,11 +307,6 @@ board.draw()
 pygame.display.flip()
 pygame.event.get()
 
-# while 1:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT: sys.exit()
-
-
 # search all possible slides
 for side in range(0, 4):
     for i in range(1, 6, 2):
@@ -324,16 +329,17 @@ for side in range(0, 4):
             spare.rotation = rotation
             print(f"\nSliding {spare} into {x1},{y1}")
             spare = board.slide(x1, y1, spare)
-            success = board.solve(route, 6, 0, 4, 2)
+            #success = board.solve(route, 6, 0, 4, 2)
+            success = board.solve(route, 0, 0, 1, 5)
             board.draw()
             pygame.display.flip()
             if success:
                 print(f"Route succeeded! {route}")
                 route.draw()
-                pygame.time.wait(1000)
             else:
                 print(f"Failed to route!")
-            pygame.time.wait(200)
+
+            wait_for_key()
 
             print(f"Sliding back {spare} into {x2},{y2}")
             spare = board.slide(x2, y2, spare)
@@ -350,7 +356,4 @@ for side in range(0, 4):
 # else:
 #     print(f"Failed to route!")
 
-while 1:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
-
+wait_for_key()
