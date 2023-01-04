@@ -85,7 +85,7 @@ pieces = [
 spare = { 'shape': BEND, 'contents': None }
 
 class Piece:
-    def __init__(self, shape, contents, start_rotation, start_x, start_y):
+    def __init__(self, shape, contents, start_rotation, file_name):
         self.shape = shape
         self.contents = contents
 
@@ -96,8 +96,11 @@ class Piece:
         # it to look like in the photo
         self.rotation = start_rotation
 
-        self.image = pygame.image.load(f"img/labyrinth_{start_y}_{start_x}.jpg")
+        self.image = pygame.image.load(file_name)
         self.image = pygame.transform.smoothscale(self.image, (piece_width, piece_height))
+
+    def __str__(self):
+        return f"{self.shape}, {self.contents}, rot={self.rotation}"
 
     def exits(self):
         if self.shape == PIPE:
@@ -149,11 +152,54 @@ class Board:
                 piece = self.pieces[y][x]
                 rect = piece.image.get_rect()
                 position = pygame.Rect(x * piece_width, y * piece_height, piece_width, piece_height)
+                image = pygame.transform.rotate(piece.image, piece.rotation * 90.0)
+                screen.blit(image, position)
 
-                # piece = pygame.transform.rotate(pieces[y][x], angle)
-                screen.blit(piece.image, position)
+    # returns the piece if we can slide
+    # if we can't slide, it returns None
+    def slide(self, x, y, old_spare):
+        # can't slide if we're not at an edge
+        if x > 0 and x < 6 and y > 0 and y < 6:
+            print(f"Cannot slide inside the board")
+            return None
 
-    def solve(self, route, x, y, finish_x, finish_y, entry_direction = 0):
+        # can't slide if we're on a static row
+        if (x == 0 or x == 6) and (y % 2 == 0):
+            print(f"Cannot slide on a static row")
+            return None
+
+        # can't slide if we're on a static column:
+        if (y == 0 or y == 6) and (x % 2 == 0):
+            print(f"Cannot slide on a static column")
+            return None
+
+        if x == 0:
+            new_spare = self.pieces[y][6]
+            for i in range(6, 0, -1):
+                self.pieces[y][i] = self.pieces[y][i - 1]
+            self.pieces[y][0] = old_spare
+        elif x == 6:
+            new_spare = self.pieces[y][0]
+            for i in range(0, 6, 1):
+                self.pieces[y][i] = self.pieces[y][i + 1]
+            self.pieces[y][6] = old_spare
+        elif y == 0:
+            new_spare = self.pieces[6][x]
+            for i in range(6, 0, -1):
+                self.pieces[i][x] = self.pieces[i - 1][x]
+            self.pieces[0][x] = old_spare
+        elif y == 6:
+            new_spare = self.pieces[0][x]
+            for i in range(0, 6, 1):
+                self.pieces[i][x] = self.pieces[i + 1][x]
+            self.pieces[6][x] = old_spare
+        else:
+            printf("This should never happen!")
+            exit()
+
+        return new_spare
+
+    def solve(self, route, x, y, finish_x, finish_y, entry_direction = None):
         # returns True if we found the finish point, False if we need to backtrack
         # accumulates the route directions in the route parameter
 
@@ -161,6 +207,7 @@ class Board:
         piece = self.pieces[y][x]
 
         exits = piece.exits()
+        # 0 = North, 1 = East, 2 = South, 3= West
         for direction in [0, 1, 2, 3]:
             print(f"Searching: {x},{y} to {finish_x},{finish_y} with entry dir {entry_direction} in dir {direction} and exits {exits} and route {route}")
             if exits[direction] is True:
@@ -218,6 +265,7 @@ def opposite_direction(direction):
     if direction == 1: opposite_direction = 3
     if direction == 2: opposite_direction = 0
     if direction == 3: opposite_direction = 1
+    if direction == None: opposite_direction = True
     return opposite_direction
 
 board = Board()
@@ -230,26 +278,72 @@ for row in pieces:
             p['shape'],
             p['contents'],
             p['rotation'],
-            x,
-            y,
+            f"img/labyrinth_{y}_{x}.jpg",
         )
         board.pieces[y][x] = piece
         x = x + 1
     x = 0
     y = y + 1
 
+spare = Piece(
+    spare['shape'],
+    spare['contents'],
+    0,
+    f"img/spare.jpg",
+)
+
 screen.fill(black)
 board.draw()
 pygame.display.flip()
+pygame.event.get()
 
-route = Route()
-success = board.solve(route, 0, 0, 3, 4)
+# search all possible slides
+for side in range(0, 4):
+    for i in range(1, 6, 2):
+        if side == 0:
+            x1 = i; x2 = i;
+            y1 = 0; y2 = 6;
+        elif side == 1:
+            x1 = 0; x2 = 6;
+            y1 = i; y2 = i;
+        elif side == 2:
+            x1 = i; x2 = i;
+            y1 = 6; y2 = 0;
+        elif side == 3:
+            x1 = 6; x2 = 0;
+            y1 = i; y2 = i;
+
+        for rotation in range(0, 4):
+            route = Route()
+
+            spare.rotation = rotation
+            print(f"\nSliding {spare} into {x1},{y1}")
+            spare = board.slide(x1, y1, spare)
+            success = board.solve(route, 6, 0, 4, 2)
+            board.draw()
+            pygame.display.flip()
+            if success:
+                print(f"Route succeeded! {route}")
+                route.draw()
+                pygame.time.wait(1000)
+            else:
+                print(f"Failed to route!")
+            pygame.time.wait(200)
+
+            print(f"Sliding back {spare} into {x2},{y2}")
+            spare = board.slide(x2, y2, spare)
+            board.draw()
+            pygame.display.flip()
+            pygame.time.wait(200)
+
+# success = board.solve(route, 6, 0, 4, 2)
 # success = board.solve(route, 6, 5, 5, 3)
-if success:
-    print(f"Route succeeded! {route}")
-    route.draw()
-else:
-    print(f"Failed to route!")
+
+# if success:
+#     print(f"Route succeeded! {route}")
+#     route.draw()
+# else:
+#     print(f"Failed to route!")
 
 while 1:
     for event in pygame.event.get():
